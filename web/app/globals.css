@@ -1,0 +1,196 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #0b0d13;
+  --color-surface: #141926;
+  --color-raised: #1c2333;
+  --color-text: #f1f4fa;
+  --color-muted: #8b95ab;
+  --color-faint: #5d6779;
+  --color-accent: #6c7bff;
+  --color-accent-soft: #4453d8;
+  --color-income: #34d399;
+  --color-expense: #fb7185;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Inter, Helvetica, Arial,
+    sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    /* Telegram отдаёт свои safe-area с Bot API 8.0; env() — запасной вариант. */
+    --safe-top: max(env(safe-area-inset-top), 0px);
+    --safe-bottom: max(env(safe-area-inset-bottom), 0px);
+    --nav-height: 62px;
+    color-scheme: dark;
+  }
+
+  html {
+    height: 100%;
+    background-color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100%;
+    background-color: var(--color-ink);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    /* Тап не должен подсвечиваться серым — в вебвью это выглядит как баг. */
+    -webkit-tap-highlight-color: transparent;
+    /* Гасим оверскролл: иначе жест вниз тянет страницу и закрывает мини-апп. */
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
+
+  /* Интерфейсные элементы не выделяются, а пользовательский текст — да. */
+  button,
+  label,
+  nav,
+  h1,
+  h2,
+  h3 {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* iOS зумит страницу на фокусе, если размер шрифта меньше 16px. */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+    font-family: inherit;
+    color: inherit;
+    background: transparent;
+    outline: none;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-faint);
+  }
+
+  /* Стрелки числового поля ломают вёрстку и на телефоне бесполезны. */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+@utility scroll-x {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Строки за экраном не раскладываются, пока до них не дошёл скролл. */
+@utility list-virtual {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 68px;
+}
+
+@utility panel {
+  background-color: var(--color-surface);
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 20px;
+}
+
+@utility press {
+  transition:
+    transform 140ms var(--ease-out-soft),
+    opacity 140ms var(--ease-out-soft),
+    background-color 140ms var(--ease-out-soft);
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+@keyframes klio-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes klio-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes klio-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes klio-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@utility sheet-in {
+  animation: klio-sheet-in 280ms var(--ease-out-soft);
+}
+
+@utility fade-in {
+  animation: klio-fade-in 200ms ease-out;
+}
+
+@utility rise-in {
+  animation: klio-rise 260ms var(--ease-out-soft) both;
+}
+
+@utility shimmer {
+  background-image: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0.04) 25%,
+    rgb(255 255 255 / 0.09) 37%,
+    rgb(255 255 255 / 0.04) 63%
+  );
+  background-size: 200% 100%;
+  animation: klio-shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
