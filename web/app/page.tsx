@@ -11,6 +11,7 @@ import { TxSheet } from '@/components/tx/tx-sheet'
 import { TxList } from '@/components/tx/tx-list'
 import { Button } from '@/components/ui/button'
 import { EmptyState, Skeleton } from '@/components/ui/feedback'
+import { ApiError } from '@/lib/client/api'
 import { useBootstrap, useRecentTransactions, useStats } from '@/lib/client/store'
 import { formatAmount } from '@/lib/format'
 import type { Card, Transaction } from '@/lib/types'
@@ -37,11 +38,18 @@ export default function HomePage() {
   const total = useMemo(() => cards.reduce((sum, card) => sum + card.balance, 0), [cards])
 
   if (error) {
+    // Вне Telegram подписи initData нет, и сервер отвечает 401 — это не сбой сети,
+    // поэтому и подсказка должна быть про способ открытия, а не про соединение.
+    const unauthorized = error instanceof ApiError && error.status === 401
     return (
       <EmptyState
-        emoji="🔌"
-        title="Не удалось загрузить"
-        description="Проверьте соединение и откройте приложение заново."
+        emoji={unauthorized ? '🔒' : '🔌'}
+        title={unauthorized ? 'Откройте через Telegram' : 'Не удалось загрузить'}
+        description={
+          unauthorized
+            ? 'Klio работает внутри Telegram: запустите приложение кнопкой в чате с ботом.'
+            : 'Проверьте соединение и откройте приложение заново.'
+        }
       />
     )
   }
