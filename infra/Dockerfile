@@ -12,9 +12,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY web/package.json ./web/package.json
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm-store \
-    pnpm config set store-dir /pnpm-store && \
-    pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # --- сборка ------------------------------------------------------------------
 FROM base AS builder
