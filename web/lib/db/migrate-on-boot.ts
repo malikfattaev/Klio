@@ -10,7 +10,7 @@ import postgres from 'postgres'
 export async function migrateOnBoot(): Promise<void> {
   const connectionString = process.env.DATABASE_URL
   if (!connectionString) {
-    console.warn('[klio] DATABASE_URL is not set — skipping migrations')
+    console.warn('[klio] DATABASE_URL is not set, skipping migrations')
     return
   }
 

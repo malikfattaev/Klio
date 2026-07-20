@@ -92,7 +92,7 @@ type TransactionInput = {
 export function useActions() {
   const { mutate } = useSWRConfig()
 
-  /** Обновляем карты из ответа сервера — балансы уже пересчитаны в БД. */
+  /** Обновляем карты из ответа сервера: балансы уже пересчитаны в БД. */
   const applyCards = useCallback(
     (cards: Card[]) => {
       mutate<Bootstrap>(BOOTSTRAP_KEY, (prev) => (prev ? { ...prev, cards } : prev), {

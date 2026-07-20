@@ -50,7 +50,7 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
       const body = (await response.json()) as { error?: string }
       if (body?.error) code = body.error
     } catch {
-      // Ответ без JSON — оставляем общий код ошибки.
+      // Ответ без JSON, оставляем общий код ошибки.
     }
     throw new ApiError(response.status, code)
   }

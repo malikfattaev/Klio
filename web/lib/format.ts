@@ -48,7 +48,7 @@ export function formatAmount(minor: number, currency: string): string {
   return `${formatNumber(minor, currency)} ${currencyMeta(currency).symbol}`
 }
 
-/** Сумма со знаком — для строк операций. */
+/** Сумма со знаком, для строк операций. */
 export function formatSigned(minor: number, currency: string, kind: 'expense' | 'income'): string {
   const sign = kind === 'income' ? '+' : '−'
   return `${sign}${formatAmount(Math.abs(minor), currency)}`
@@ -80,7 +80,7 @@ function startOfDay(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
 }
 
-/** «Сегодня» / «Вчера» / «14 марта» — заголовки групп в истории. */
+/** «Сегодня» / «Вчера» / «14 марта»: заголовки групп в истории. */
 export function formatDayLabel(iso: string, now = new Date()): string {
   const date = new Date(iso)
   const diffDays = Math.round((startOfDay(now) - startOfDay(date)) / 86_400_000)

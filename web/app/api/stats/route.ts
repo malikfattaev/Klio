@@ -11,13 +11,13 @@ import { parseDate } from '@/lib/validate'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-/** Дальше этого порога дневные столбики нечитаемы — переключаемся на месяцы. */
+/** Дальше этого порога дневные столбики нечитаемы, поэтому переключаемся на месяцы. */
 const DAILY_GRANULARITY_LIMIT_DAYS = 62
 
 let zoneCache: Set<string> | null = null
 
 /**
- * Имя таймзоны уходит в `AT TIME ZONE`, поэтому его мало экранировать —
+ * Имя таймзоны уходит в `AT TIME ZONE`, поэтому его мало экранировать:
  * неизвестная зона роняет запрос. Сверяем со списком, известным среде выполнения.
  */
 function safeTimeZone(value: string | null): string {
@@ -44,7 +44,7 @@ export async function GET(request: Request): Promise<Response> {
       parseDate(searchParams.get('from')) ?? new Date(to.getTime() - 29 * 86_400_000)
     const timeZone = safeTimeZone(searchParams.get('tz'))
 
-    // Период уже разобран выше — переиспользуем общие фильтры только для карты.
+    // Период уже разобран выше, поэтому переиспользуем общие фильтры только для карты.
     const scoped = new URLSearchParams(searchParams)
     scoped.delete('from')
     scoped.delete('to')

@@ -15,7 +15,7 @@ import { useToast } from '@/components/ui/toast'
 type CategorySheetProps = {
   open: boolean
   onClose: () => void
-  /** null — создание новой категории. */
+  /** null: создание новой категории. */
   category: Category | null
   kind: TxKind
   onCreated?: () => void

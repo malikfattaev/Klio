@@ -27,7 +27,7 @@ export default function HomePage() {
   const total = useMemo(() => cards.reduce((sum, card) => sum + card.balance, 0), [cards])
 
   if (error) {
-    // Вне Telegram подписи initData нет, и сервер отвечает 401 — это не сбой сети,
+    // Вне Telegram подписи initData нет, и сервер отвечает 401, а это не сбой сети,
     // поэтому и подсказка должна быть про способ открытия, а не про соединение.
     const unauthorized = error instanceof ApiError && error.status === 401
     return (
@@ -76,7 +76,7 @@ export default function HomePage() {
         <EmptyState
           emoji="💳"
           title="Начните с карты"
-          description="Добавьте карту и её начальный баланс — потом можно будет записывать расходы и доходы."
+          description="Добавьте карту и её начальный баланс, потом можно будет записывать расходы и доходы."
           action={
             <Button onClick={() => setCardSheet({ open: true, card: null })}>
               Добавить карту

@@ -35,7 +35,7 @@ export function getWebApp(): TelegramWebApp | null {
   return window.Telegram?.WebApp ?? null
 }
 
-/** Пустая строка вне Telegram — тогда сервер отвечает по dev-лазейке. */
+/** Пустая строка вне Telegram, тогда сервер отвечает по dev-лазейке. */
 export function getInitData(): string {
   return getWebApp()?.initData ?? ''
 }

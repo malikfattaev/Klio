@@ -42,7 +42,7 @@ export function SettingsSheet({
       <div className="pb-2">
         <span className="mb-2 block text-[13px] font-medium text-muted">Валюта</span>
         <p className="mb-3 text-[13px] leading-relaxed text-faint">
-          Одна валюта на все карты — иначе общий баланс складывал бы несравнимые суммы.
+          Одна валюта на все карты, иначе общий баланс складывал бы несравнимые суммы.
           Смена валюты не пересчитывает уже введённые суммы.
         </p>
 

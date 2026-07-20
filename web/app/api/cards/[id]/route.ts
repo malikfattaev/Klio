@@ -57,7 +57,7 @@ export async function PATCH(request: Request, context: Context): Promise<Respons
   })
 }
 
-/** Удаление карты уносит её операции — на связи в схеме стоит ON DELETE CASCADE. */
+/** Удаление карты уносит её операции: на связи в схеме стоит ON DELETE CASCADE. */
 export async function DELETE(request: Request, context: Context): Promise<Response> {
   return guard(async () => {
     const user = await requireUser(request)

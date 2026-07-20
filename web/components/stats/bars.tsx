@@ -10,7 +10,7 @@ const dayLabel = new Intl.DateTimeFormat('ru-RU', { day: 'numeric' })
 const monthLabel = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
 
 /**
- * Динамика по периоду. Столбики — это div'ы с height в процентах: для полусотни
+ * Динамика по периоду. Столбики: div'ы с height в процентах. Для полусотни
  * точек это дешевле, чем SVG, и не требует пересчёта при ресайзе.
  */
 export function Bars({
@@ -33,7 +33,7 @@ export function Bars({
   if (points.length === 0) return null
 
   const formatter = granularity === 'day' ? dayLabel : monthLabel
-  // Подписываем не каждый столбик — иначе они наезжают друг на друга.
+  // Подписываем не каждый столбик, иначе они наезжают друг на друга.
   const labelStep = Math.max(1, Math.ceil(points.length / 6))
 
   return (

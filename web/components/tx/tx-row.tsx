@@ -14,7 +14,7 @@ export const TxRow = memo(function TxRow({
 }: {
   transaction: Transaction
   category: Category | undefined
-  /** Показываем только когда карт несколько — иначе это шум. */
+  /** Показываем только когда карт несколько, иначе это шум. */
   cardName: string | null
   currency: string
   onClick: () => void

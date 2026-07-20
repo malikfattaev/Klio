@@ -29,7 +29,7 @@ function amountToInput(minor: number): string {
 type TxSheetProps = {
   open: boolean
   onClose: () => void
-  /** null — создание новой операции. */
+  /** null: создание новой операции. */
   transaction: Transaction | null
   cards: Card[]
   categories: Category[]
@@ -44,7 +44,7 @@ type TxSheetProps = {
 
 export function TxSheet(props: TxSheetProps) {
   // Ключ пересобирает форму на каждое открытие, поэтому поля берут начальные
-  // значения прямо из props — эффект-сбрасыватель не нужен и состояние
+  // значения прямо из props, поэтому отдельный эффект-сбрасыватель не нужен, а состояние
   // от прошлой операции не может утечь в следующую.
   const key = props.open ? `open-${props.transaction?.id ?? 'new'}` : 'closed'
   return <TxForm key={key} {...props} />

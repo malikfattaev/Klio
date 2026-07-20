@@ -4,7 +4,7 @@ import { useId } from 'react'
 
 import { currencyMeta } from '@/lib/format'
 
-/** Оставляем цифры, один разделитель дробной части и — по разрешению — минус. */
+/** Оставляем цифры, один разделитель дробной части и, если разрешено, минус. */
 export function sanitizeMoney(input: string, allowNegative: boolean): string {
   const negative = allowNegative && input.trimStart().startsWith('-')
   const digitsAndSeparator = input.replace(/[^\d.,]/g, '').replace(/[.,]/g, ',')
@@ -16,7 +16,7 @@ export function sanitizeMoney(input: string, allowNegative: boolean): string {
   return negative ? `-${body}` : body
 }
 
-/** Разбивает целую часть по три разряда — «1 250 000». */
+/** Разбивает целую часть по три разряда, например «1 250 000». */
 export function groupMoney(input: string): string {
   if (!input) return ''
   const negative = input.startsWith('-')

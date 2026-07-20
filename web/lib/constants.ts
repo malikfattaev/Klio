@@ -33,7 +33,7 @@ export const CARD_THEMES: Record<CardThemeKey, { from: string; to: string; label
 
 export const CARD_THEME_KEYS = Object.keys(CARD_THEMES) as CardThemeKey[]
 
-/** Палитра для категорий — согласована с диаграммой на странице статистики. */
+/** Палитра для категорий, согласована с диаграммой на странице статистики. */
 export const CATEGORY_COLORS = [
   '#6366f1',
   '#8b5cf6',

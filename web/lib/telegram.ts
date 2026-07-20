@@ -29,7 +29,7 @@ function safeEqualHex(a: string, b: string): boolean {
  * Проверяет подпись initData ботовым токеном по схеме из документации Telegram:
  * secret = HMAC_SHA256("WebAppData", bot_token), затем HMAC_SHA256(secret, data_check_string).
  *
- * Возвращает пользователя либо null — вызывающий код обязан трактовать null как 401.
+ * Возвращает пользователя либо null: вызывающий код обязан трактовать null как 401.
  */
 export function verifyInitData(initData: string, botToken: string): TelegramUser | null {
   if (!initData || !botToken) return null

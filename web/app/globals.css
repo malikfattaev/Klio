@@ -21,7 +21,7 @@
 
 @layer base {
   :root {
-    /* Telegram отдаёт свои safe-area с Bot API 8.0; env() — запасной вариант. */
+    /* Telegram отдаёт свои safe-area с Bot API 8.0, env() тут запасной вариант. */
     --safe-top: max(env(safe-area-inset-top), 0px);
     --safe-bottom: max(env(safe-area-inset-bottom), 0px);
     --nav-height: 62px;
@@ -39,14 +39,14 @@
     background-color: var(--color-ink);
     color: var(--color-text);
     font-family: var(--font-sans);
-    /* Тап не должен подсвечиваться серым — в вебвью это выглядит как баг. */
+    /* Тап не должен подсвечиваться серым: в вебвью это выглядит как баг. */
     -webkit-tap-highlight-color: transparent;
     /* Гасим оверскролл: иначе жест вниз тянет страницу и закрывает мини-апп. */
     overscroll-behavior: none;
     touch-action: manipulation;
   }
 
-  /* Интерфейсные элементы не выделяются, а пользовательский текст — да. */
+  /* Интерфейсные элементы не выделяются, а пользовательский текст выделяется. */
   button,
   label,
   nav,

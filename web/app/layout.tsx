@@ -6,7 +6,7 @@ import { BottomNav } from '@/components/shell/bottom-nav'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Klio — учёт расходов',
+  title: 'Klio · учёт расходов',
   description: 'Карты, расходы, доходы и статистика по категориям',
   applicationName: 'Klio',
 }

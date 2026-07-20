@@ -8,7 +8,7 @@ import { verifyInitData, type TelegramUser } from './telegram'
 /**
  * Мини-апп живёт в iframe на web.telegram.org, поэтому сессионные куки там
  * третьесторонние и часть браузеров их режет. Вместо кук каждый запрос несёт
- * `Authorization: tma <initData>` и проверяется подписью — это дёшево и без состояния.
+ * `Authorization: tma <initData>` и проверяется подписью: это дёшево и без состояния.
  */
 export async function requireUser(request: Request): Promise<UserRow | null> {
   const telegramUser = resolveTelegramUser(request)
@@ -24,7 +24,7 @@ function resolveTelegramUser(request: Request): TelegramUser | null {
   if (scheme === 'tma' && initData) {
     const botToken = process.env.TELEGRAM_BOT_TOKEN
     if (!botToken) {
-      console.error('TELEGRAM_BOT_TOKEN is not set — every request will be rejected')
+      console.error('TELEGRAM_BOT_TOKEN is not set, every request will be rejected')
       return null
     }
     return verifyInitData(initData, botToken)
@@ -71,7 +71,7 @@ async function provisionUser(telegramUser: TelegramUser): Promise<UserRow> {
     return created
   }
 
-  // Клиент шлёт несколько запросов параллельно — на первом запуске они гонятся
+  // Клиент шлёт несколько запросов параллельно, и на первом запуске они гонятся
   // за создание одной и той же строки. Проигравший просто перечитывает победителя.
   const [raced] = await db
     .select()

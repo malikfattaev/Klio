@@ -8,7 +8,7 @@ export const PERIODS: { value: Period; label: string }[] = [
 ]
 
 /**
- * Верхняя граница — конец суток, а не текущий момент. Иначе значение менялось бы
+ * Верхняя граница: конец суток, а не текущий момент. Иначе значение менялось бы
  * на каждый рендер, ключ SWR не совпадал бы сам с собой и статистика
  * перезапрашивалась бы бесконечно.
  */
@@ -17,7 +17,7 @@ function endOfDay(date: Date): Date {
 }
 
 /**
- * Границы считаются от календарных единиц («этот месяц»), а не «последние 30 дней» —
+ * Границы считаются от календарных единиц («этот месяц»), а не «последние 30 дней»,
  * так цифры сходятся с тем, как человек сам думает о своих тратах.
  */
 export function periodRange(period: Period, now = new Date()): { from: Date; to: Date } {
@@ -25,7 +25,7 @@ export function periodRange(period: Period, now = new Date()): { from: Date; to:
   switch (period) {
     case 'week': {
       const day = now.getDay()
-      // В JS неделя начинается с воскресенья, у нас — с понедельника.
+      // В JS неделя начинается с воскресенья, у нас с понедельника.
       const shift = day === 0 ? 6 : day - 1
       const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - shift)
       return { from, to }

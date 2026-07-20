@@ -2,7 +2,7 @@
 
 import { haptic } from '@/lib/client/telegram'
 
-/** Главное действие приложения — держим его в зоне большого пальца над навигацией. */
+/** Главное действие приложения: держим его в зоне большого пальца над навигацией. */
 export function Fab({ onClick, label = 'Добавить операцию' }: { onClick: () => void; label?: string }) {
   return (
     <button

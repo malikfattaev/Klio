@@ -36,7 +36,7 @@ function inputToBalance(input: string): number | null {
 type CardSheetProps = {
   open: boolean
   onClose: () => void
-  /** null — создание новой карты. */
+  /** null: создание новой карты. */
   card: Card | null
   currency: string
 }
@@ -92,7 +92,7 @@ function CardForm({ open, onClose, card, currency }: CardSheetProps) {
       title: `Удалить «${card.name}»?`,
       description:
         card.txCount > 0
-          ? `Вместе с картой удалятся её операции — ${card.txCount} шт. Отменить это нельзя.`
+          ? `Вместе с картой удалятся её операции (${card.txCount} шт.). Отменить это нельзя.`
           : 'Отменить это нельзя.',
       confirmLabel: 'Удалить',
       destructive: true,

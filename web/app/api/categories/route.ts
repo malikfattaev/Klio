@@ -45,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
       .onConflictDoNothing()
       .returning({ id: categories.id })
 
-    // Уникальный индекс (user, kind, name) — значит такая категория уже есть.
+    // Уникальный индекс (user, kind, name) значит, что такая категория уже есть.
     if (!created) return badRequest('duplicate_category')
 
     return json({ categories: await listCategories(user.id) }, 201)

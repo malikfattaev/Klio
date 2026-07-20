@@ -25,7 +25,7 @@ export const CardTile = memo(function CardTile({
       className="press relative flex h-[148px] w-[248px] shrink-0 flex-col justify-between overflow-hidden rounded-3xl p-4 text-left text-white shadow-[0_10px_30px_-12px_rgba(0,0,0,0.8)]"
       style={{ background: `linear-gradient(135deg, ${theme.from}, ${theme.to})` }}
     >
-      {/* Блик поверх градиента — без него плитка выглядит плоской заливкой. */}
+      {/* Блик поверх градиента: без него плитка выглядит плоской заливкой. */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0"

@@ -7,7 +7,7 @@ import { parseDate, parseId, parseKind } from './validate'
 
 /**
  * Агрегаты приходят из raw-SQL, минуя маппинг колонок drizzle, поэтому драйвер
- * может отдать их строкой (int8) — приводим в одном месте.
+ * может отдать их строкой (int8), поэтому приводим в одном месте.
  */
 export function num(value: unknown): number {
   if (typeof value === 'number') return value
@@ -19,7 +19,7 @@ export function num(value: unknown): number {
   return 0
 }
 
-/** Карты с балансами, посчитанными в БД — клиенту не нужно ничего суммировать. */
+/** Карты с балансами, посчитанными в БД: клиенту не нужно ничего суммировать. */
 export async function listCards(userId: number): Promise<Card[]> {
   const rows = await db
     .select({
@@ -83,7 +83,7 @@ export function toTransactionDto(row: TransactionRow): Transaction {
 
 /**
  * Фильтры истории из query-параметров. Пустой или мусорный параметр просто
- * игнорируется — на списке операций это безопаснее, чем ронять запрос ошибкой.
+ * игнорируется: на списке операций это безопаснее, чем ронять запрос ошибкой.
  */
 export function transactionFilters(userId: number, params: URLSearchParams): SQL[] {
   const conditions: SQL[] = [eq(transactions.userId, userId)]
@@ -123,7 +123,7 @@ function cursorCondition(cursor: string | null): SQL | null {
   if (!occurredAt || !id) return null
 
   // Кортежное сравнение даёт стабильную страницу даже когда у операций
-  // совпадает время — обычная сортировка по одной дате их бы перемешала.
+  // совпадает время, а обычная сортировка по одной дате их бы перемешала.
   return sql`(${transactions.occurredAt}, ${transactions.id}) < (${occurredAt.toISOString()}::timestamptz, ${id}::bigint)`
 }
 
