@@ -5,7 +5,7 @@ import { db } from '@/lib/db'
 import { cards } from '@/lib/db/schema'
 import { badRequest, guard, json, notFound, unauthorized } from '@/lib/http'
 import { listCards } from '@/lib/queries'
-import { parseBalance, parseId, parseText, parseTheme, readJson } from '@/lib/validate'
+import { parseBalance, parseCurrency, parseId, parseText, parseTheme, readJson } from '@/lib/validate'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -35,6 +35,12 @@ export async function PATCH(request: Request, context: Context): Promise<Respons
       const theme = parseTheme(body.theme)
       if (!theme) return badRequest('invalid_theme')
       patch.theme = theme
+    }
+
+    if (body.currency !== undefined) {
+      const currency = parseCurrency(body.currency)
+      if (!currency) return badRequest('invalid_currency')
+      patch.currency = currency
     }
 
     if (body.initialBalance !== undefined) {

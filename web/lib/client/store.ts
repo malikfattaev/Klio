@@ -8,7 +8,6 @@ import type {
   Bootstrap,
   Card,
   Category,
-  Me,
   Stats,
   Transaction,
   TransactionPage,
@@ -67,12 +66,14 @@ export function useTransactions(filters: TransactionFilters = {}) {
   return { ...swr, items, hasMore, isLoadingMore }
 }
 
-export function useStats(period: Period, cardId?: number | null) {
+/** У карт разная валюта, поэтому статистика всегда считается в рамках одной. */
+export function useStats(period: Period, currency: string, cardId?: number | null) {
   const { from, to } = periodRange(period)
   const params = new URLSearchParams({
     from: from.toISOString(),
     to: to.toISOString(),
     tz: timeZone(),
+    currency,
   })
   if (cardId) params.set('cardId', String(cardId))
 
@@ -162,7 +163,7 @@ export function useActions() {
   )
 
   const createCard = useCallback(
-    async (input: { name: string; theme: string; initialBalance: number }) => {
+    async (input: { name: string; theme: string; currency: string; initialBalance: number }) => {
       const result = await postJson<{ cards: Card[] }>('/api/cards', input)
       applyCards(result.cards)
     },
@@ -212,17 +213,6 @@ export function useActions() {
     [applyCategories, refreshDerived],
   )
 
-  const setCurrency = useCallback(
-    async (currency: string) => {
-      const result = await patchJson<{ me: Me }>('/api/me', { currency })
-      mutate<Bootstrap>(BOOTSTRAP_KEY, (prev) => (prev ? { ...prev, me: result.me } : prev), {
-        revalidate: false,
-      })
-      refreshDerived()
-    },
-    [mutate, refreshDerived],
-  )
-
   return {
     createTransaction,
     updateTransaction,
@@ -233,6 +223,5 @@ export function useActions() {
     createCategory,
     updateCategory,
     deleteCategory,
-    setCurrency,
   }
 }

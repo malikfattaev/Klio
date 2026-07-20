@@ -25,11 +25,9 @@ const KIND_OPTIONS: { value: TxKind; label: string }[] = [
 export function QuickAddPanel({
   cards,
   categories,
-  currency,
 }: {
   cards: Card[]
   categories: Category[]
-  currency: string
 }) {
   const { createTransaction } = useActions()
   const toast = useToast()
@@ -53,6 +51,8 @@ export function QuickAddPanel({
 
   const accent = kind === 'income' ? 'var(--color-income)' : 'var(--color-expense)'
   const resolvedCardId = cardId ?? cards[0]?.id ?? null
+  // Сумма вводится в валюте выбранной карты, а не какой-то общей для аккаунта.
+  const currency = cards.find((card) => card.id === resolvedCardId)?.currency ?? 'UZS'
 
   const submit = async () => {
     const minor = parseAmountToMinor(amount)
@@ -101,7 +101,7 @@ export function QuickAddPanel({
                 card.id === resolvedCardId ? 'bg-accent text-white' : 'bg-raised text-muted'
               }`}
             >
-              {card.name}
+              {card.name} · {card.currency}
             </button>
           ))}
         </div>

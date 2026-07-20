@@ -18,17 +18,36 @@ const KIND_OPTIONS: { value: TxKind; label: string }[] = [
   { value: 'income', label: 'Доходы' },
 ]
 
+const DEFAULT_CURRENCY = 'UZS'
+
 export default function StatsPage() {
   const { data: bootstrap } = useBootstrap()
   const [period, setPeriod] = useState<Period>('month')
   const [kind, setKind] = useState<TxKind>('expense')
+  const [pickedCurrency, setPickedCurrency] = useState<string | null>(null)
   const [editing, setEditing] = useState<Category | null>(null)
   const [creating, setCreating] = useState(false)
 
-  const { data: stats, isLoading } = useStats(period)
-
-  const currency = bootstrap?.me.currency ?? 'UZS'
+  const cards = useMemo(() => bootstrap?.cards ?? [], [bootstrap])
   const categories = useMemo(() => bootstrap?.categories ?? [], [bootstrap])
+
+  // Разбивка по категориям всегда в одной валюте: карты в разных валютах
+  // мешать в одну сумму нельзя. Переключатель показываем, только если он
+  // вообще на что-то влияет: когда у пользователя всего одна валюта, это
+  // был бы бесполезный элемент интерфейса.
+  const availableCurrencies = useMemo(() => {
+    const set = new Set(cards.map((card) => card.currency))
+    set.add(DEFAULT_CURRENCY)
+    return [...set]
+  }, [cards])
+
+  const currency =
+    pickedCurrency && availableCurrencies.includes(pickedCurrency)
+      ? pickedCurrency
+      : DEFAULT_CURRENCY
+
+  const { data: stats, isLoading } = useStats(period, currency)
+
   const accent = kind === 'income' ? 'var(--color-income)' : 'var(--color-expense)'
 
   const slices = kind === 'income' ? (stats?.income ?? []) : (stats?.expense ?? [])
@@ -57,6 +76,13 @@ export default function StatsPage() {
         <div className="flex flex-col gap-2">
           <Segmented options={PERIODS} value={period} onChange={setPeriod} />
           <Segmented options={KIND_OPTIONS} value={kind} onChange={setKind} accent={accent} />
+          {availableCurrencies.length > 1 ? (
+            <Segmented
+              options={availableCurrencies.map((code) => ({ value: code, label: code }))}
+              value={currency}
+              onChange={setPickedCurrency}
+            />
+          ) : null}
         </div>
       </header>
 

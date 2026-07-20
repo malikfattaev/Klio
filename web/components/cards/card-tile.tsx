@@ -8,11 +8,9 @@ import type { Card } from '@/lib/types'
 
 export const CardTile = memo(function CardTile({
   card,
-  currency,
   onClick,
 }: {
   card: Card
-  currency: string
   onClick: () => void
 }) {
   const theme = CARD_THEMES[card.theme as CardThemeKey] ?? CARD_THEMES.indigo
@@ -51,7 +49,7 @@ export const CardTile = memo(function CardTile({
             negative ? 'text-rose-100' : ''
           }`}
         >
-          {formatAmount(card.balance, currency)}
+          {formatAmount(card.balance, card.currency)}
         </span>
       </div>
     </button>

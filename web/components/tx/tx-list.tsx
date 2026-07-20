@@ -9,7 +9,8 @@ import { TxRow } from './tx-row'
 type Group = {
   key: string
   label: string
-  net: number
+  /** Итог дня считается по каждой валюте отдельно: карты могут быть в разных валютах. */
+  netByCurrency: Map<string, number>
   items: Transaction[]
 }
 
@@ -23,14 +24,12 @@ export function TxList({
   items,
   cards,
   categories,
-  currency,
   onSelect,
   grouped = true,
 }: {
   items: Transaction[]
   cards: Card[]
   categories: Category[]
-  currency: string
   onSelect: (transaction: Transaction) => void
   grouped?: boolean
 }) {
@@ -42,36 +41,49 @@ export function TxList({
   const showCardName = cards.length > 1
 
   const groups = useMemo<Group[]>(() => {
-    if (!grouped) return [{ key: 'all', label: '', net: 0, items }]
+    if (!grouped) return [{ key: 'all', label: '', netByCurrency: new Map(), items }]
 
     const map = new Map<string, Group>()
     for (const transaction of items) {
       const key = dayKey(transaction.occurredAt)
       let group = map.get(key)
       if (!group) {
-        group = { key, label: formatDayLabel(transaction.occurredAt), net: 0, items: [] }
+        group = {
+          key,
+          label: formatDayLabel(transaction.occurredAt),
+          netByCurrency: new Map(),
+          items: [],
+        }
         map.set(key, group)
       }
       group.items.push(transaction)
-      group.net += transaction.kind === 'income' ? transaction.amount : -transaction.amount
+
+      const currency = cardById.get(transaction.cardId)?.currency ?? 'UZS'
+      const delta = transaction.kind === 'income' ? transaction.amount : -transaction.amount
+      group.netByCurrency.set(currency, (group.netByCurrency.get(currency) ?? 0) + delta)
     }
     return [...map.values()]
-  }, [items, grouped])
+  }, [items, grouped, cardById])
 
   return (
     <div className="flex flex-col gap-4">
       {groups.map((group) => (
         <section key={group.key}>
           {grouped ? (
-            <header className="mb-1 flex items-baseline justify-between px-2">
+            <header className="mb-1 flex items-baseline justify-between gap-2 px-2">
               <h3 className="text-[13px] font-semibold text-muted">{group.label}</h3>
-              <span
-                className={`tnum text-[13px] font-medium ${
-                  group.net > 0 ? 'text-income' : 'text-faint'
-                }`}
-              >
-                {group.net > 0 ? '+' : group.net < 0 ? '−' : ''}
-                {formatAmount(Math.abs(group.net), currency)}
+              <span className="flex flex-wrap justify-end gap-x-2">
+                {[...group.netByCurrency.entries()].map(([currency, net]) => (
+                  <span
+                    key={currency}
+                    className={`tnum text-[13px] font-medium ${
+                      net > 0 ? 'text-income' : 'text-faint'
+                    }`}
+                  >
+                    {net > 0 ? '+' : net < 0 ? '−' : ''}
+                    {formatAmount(Math.abs(net), currency)}
+                  </span>
+                ))}
               </span>
             </header>
           ) : null}
@@ -87,7 +99,7 @@ export function TxList({
                 cardName={
                   showCardName ? (cardById.get(transaction.cardId)?.name ?? null) : null
                 }
-                currency={currency}
+                currency={cardById.get(transaction.cardId)?.currency ?? 'UZS'}
                 onClick={() => onSelect(transaction)}
               />
             ))}

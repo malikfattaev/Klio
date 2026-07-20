@@ -12,6 +12,9 @@ import { useBootstrap } from '@/lib/client/store'
 import { formatAmount } from '@/lib/format'
 import type { Card } from '@/lib/types'
 
+/** Валюта главного итога: суммировать карты в разных валютах напрямую нельзя. */
+const PRIMARY_CURRENCY = 'UZS'
+
 export default function HomePage() {
   const { data, isLoading, error } = useBootstrap()
 
@@ -22,9 +25,25 @@ export default function HomePage() {
 
   const cards = useMemo(() => data?.cards ?? [], [data])
   const categories = useMemo(() => data?.categories ?? [], [data])
-  const currency = data?.me.currency ?? 'UZS'
 
-  const total = useMemo(() => cards.reduce((sum, card) => sum + card.balance, 0), [cards])
+  const primaryTotal = useMemo(
+    () =>
+      cards
+        .filter((card) => card.currency === PRIMARY_CURRENCY)
+        .reduce((sum, card) => sum + card.balance, 0),
+    [cards],
+  )
+
+  // Карты в остальных валютах не входят в общий итог: сумма долларов и сумов
+  // не значит ничего. Каждая валюта показывается отдельной плашкой рядом.
+  const secondaryTotals = useMemo(() => {
+    const byCurrency = new Map<string, number>()
+    for (const card of cards) {
+      if (card.currency === PRIMARY_CURRENCY) continue
+      byCurrency.set(card.currency, (byCurrency.get(card.currency) ?? 0) + card.balance)
+    }
+    return [...byCurrency.entries()]
+  }, [cards])
 
   if (error) {
     // Вне Telegram подписи initData нет, и сервер отвечает 401, а это не сбой сети,
@@ -52,26 +71,34 @@ export default function HomePage() {
           {data?.me.firstName ? `Привет, ${data.me.firstName}` : 'Общий баланс'}
         </p>
         <h1 className="tnum mt-1 text-[32px] leading-tight font-bold break-all">
-          {formatAmount(total, currency)}
+          {formatAmount(primaryTotal, PRIMARY_CURRENCY)}
         </h1>
+
+        {secondaryTotals.length > 0 ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {secondaryTotals.map(([currency, amount]) => (
+              <span
+                key={currency}
+                className="panel px-3 py-1 text-[14px] font-semibold tabular-nums"
+              >
+                {formatAmount(amount, currency)}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </header>
 
       <section className="mb-5">
         <div className="scroll-x -mx-4 flex gap-3 px-4 pb-1">
           {cards.map((card) => (
-            <CardTile
-              key={card.id}
-              card={card}
-              currency={currency}
-              onClick={() => setCardSheet({ open: true, card })}
-            />
+            <CardTile key={card.id} card={card} onClick={() => setCardSheet({ open: true, card })} />
           ))}
           <AddCardTile onClick={() => setCardSheet({ open: true, card: null })} />
         </div>
       </section>
 
       {cards.length > 0 ? (
-        <QuickAddPanel cards={cards} categories={categories} currency={currency} />
+        <QuickAddPanel cards={cards} categories={categories} />
       ) : (
         <EmptyState
           emoji="💳"
@@ -89,7 +116,6 @@ export default function HomePage() {
         open={cardSheet.open}
         onClose={() => setCardSheet({ open: false, card: null })}
         card={cardSheet.card}
-        currency={currency}
       />
     </>
   )

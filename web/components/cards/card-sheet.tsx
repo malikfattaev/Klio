@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { useActions } from '@/lib/client/store'
-import { CARD_THEMES, CARD_THEME_KEYS, type CardThemeKey } from '@/lib/constants'
+import { CARD_THEMES, CARD_THEME_KEYS, CURRENCIES, CURRENCY_CODES, type CardThemeKey } from '@/lib/constants'
 import { errorMessage } from '@/lib/client/api'
 import { parseAmountToMinor } from '@/lib/format'
 import type { Card } from '@/lib/types'
@@ -38,7 +38,6 @@ type CardSheetProps = {
   onClose: () => void
   /** null: создание новой карты. */
   card: Card | null
-  currency: string
 }
 
 export function CardSheet(props: CardSheetProps) {
@@ -48,13 +47,14 @@ export function CardSheet(props: CardSheetProps) {
   return <CardForm key={key} {...props} />
 }
 
-function CardForm({ open, onClose, card, currency }: CardSheetProps) {
+function CardForm({ open, onClose, card }: CardSheetProps) {
   const { createCard, updateCard, deleteCard } = useActions()
   const toast = useToast()
   const confirm = useConfirm()
 
   const [name, setName] = useState(card?.name ?? '')
   const [theme, setTheme] = useState<CardThemeKey>((card?.theme as CardThemeKey) ?? 'indigo')
+  const [currency, setCurrency] = useState(card?.currency ?? 'UZS')
   const [balance, setBalance] = useState(card ? balanceToInput(card.initialBalance) : '')
   const [saving, setSaving] = useState(false)
 
@@ -76,7 +76,7 @@ function CardForm({ open, onClose, card, currency }: CardSheetProps) {
       if (card) {
         await updateCard(card.id, { name: trimmedName, theme, initialBalance })
       } else {
-        await createCard({ name: trimmedName, theme, initialBalance })
+        await createCard({ name: trimmedName, theme, currency, initialBalance })
       }
       onClose()
     } catch (error) {
@@ -136,16 +136,41 @@ function CardForm({ open, onClose, card, currency }: CardSheetProps) {
           />
         </Field>
 
+        {card ? (
+          <Field label="Валюта">
+            <div className="flex h-13 items-center rounded-2xl border border-white/8 bg-raised px-4 text-muted">
+              {CURRENCIES[currency as keyof typeof CURRENCIES]?.label ?? currency} ({currency})
+            </div>
+          </Field>
+        ) : (
+          <div>
+            <span className="mb-2 block text-[13px] font-medium text-muted">Валюта</span>
+            <div className="grid grid-cols-3 gap-2">
+              {CURRENCY_CODES.map((code) => {
+                const active = code === currency
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => setCurrency(code)}
+                    className={`press flex flex-col items-center gap-0.5 rounded-2xl px-2 py-2.5 ${
+                      active ? 'bg-accent/20 ring-1 ring-accent' : 'bg-raised'
+                    }`}
+                  >
+                    <span className="text-[16px] font-semibold">{CURRENCIES[code].symbol}</span>
+                    <span className="text-[11px] text-muted">{code}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         <Field
           label="Начальный баланс"
           hint="Сколько было на карте до начала учёта. Это значение можно поменять в любой момент."
         >
-          <MoneyInput
-            value={balance}
-            onChange={setBalance}
-            currency={currency}
-            allowNegative
-          />
+          <MoneyInput value={balance} onChange={setBalance} currency={currency} allowNegative />
         </Field>
 
         <div>

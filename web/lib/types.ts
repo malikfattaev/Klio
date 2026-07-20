@@ -5,13 +5,13 @@ export type Me = {
   firstName: string | null
   username: string | null
   photoUrl: string | null
-  currency: string
 }
 
 export type Card = {
   id: number
   name: string
   theme: string
+  currency: string
   initialBalance: number
   /** initialBalance + доходы − расходы, посчитано на сервере. */
   balance: number

@@ -23,7 +23,6 @@ export async function GET(request: Request): Promise<Response> {
         firstName: user.firstName,
         username: user.username,
         photoUrl: user.photoUrl,
-        currency: user.currency,
       },
       cards,
       categories,

@@ -33,7 +33,6 @@ type TxSheetProps = {
   transaction: Transaction | null
   cards: Card[]
   categories: Category[]
-  currency: string
   defaultCardId?: number | null
   /**
    * Для списков на useSWRInfinite: их ключи недоступны глобальной мутации,
@@ -44,7 +43,7 @@ type TxSheetProps = {
 
 export function TxSheet(props: TxSheetProps) {
   // Ключ пересобирает форму на каждое открытие, поэтому поля берут начальные
-  // значения прямо из props, поэтому отдельный эффект-сбрасыватель не нужен, а состояние
+  // значения прямо из props: отдельный эффект-сбрасыватель не нужен, а состояние
   // от прошлой операции не может утечь в следующую.
   const key = props.open ? `open-${props.transaction?.id ?? 'new'}` : 'closed'
   return <TxForm key={key} {...props} />
@@ -56,7 +55,6 @@ function TxForm({
   transaction,
   cards,
   categories,
-  currency,
   defaultCardId,
   onSaved,
 }: TxSheetProps) {
@@ -90,6 +88,8 @@ function TxForm({
     : null
 
   const accent = kind === 'income' ? 'var(--color-income)' : 'var(--color-expense)'
+  // Сумма вводится в валюте выбранной карты, а не какой-то общей для аккаунта.
+  const currency = cards.find((card) => card.id === cardId)?.currency ?? 'UZS'
 
   const submit = async () => {
     const minor = parseAmountToMinor(amount)
@@ -198,7 +198,7 @@ function TxForm({
                     card.id === cardId ? 'bg-accent text-white' : 'bg-raised text-muted'
                   }`}
                 >
-                  {card.name}
+                  {card.name} · {card.currency}
                 </button>
               ))}
             </div>

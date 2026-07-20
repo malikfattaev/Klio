@@ -22,8 +22,6 @@ export const users = pgTable(
     username: text('username'),
     photoUrl: text('photo_url'),
     languageCode: text('language_code'),
-    /** Одна валюта на весь аккаунт: иначе «общий баланс» по картам был бы бессмысленной суммой. */
-    currency: text('currency').notNull().default('UZS'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('users_telegram_id_key').on(t.telegramId)],
@@ -38,7 +36,9 @@ export const cards = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     theme: text('theme').notNull().default('indigo'),
-    /** Стартовый баланс в минорных единицах (сотых). */
+    /** Своя валюта на карту: так можно держать сумовую и долларовую карты одновременно. */
+    currency: text('currency').notNull().default('UZS'),
+    /** Стартовый баланс в минорных единицах (сотых) этой же валюты. */
     initialBalance: bigint('initial_balance', { mode: 'number' }).notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

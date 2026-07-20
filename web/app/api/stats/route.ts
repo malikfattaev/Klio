@@ -1,12 +1,12 @@
-import { and, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 
 import { requireUser } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { categories, transactions } from '@/lib/db/schema'
+import { cards, categories, transactions } from '@/lib/db/schema'
 import { guard, json, unauthorized } from '@/lib/http'
 import { num, transactionFilters } from '@/lib/queries'
 import type { Stats, StatsPoint, StatsSlice, TxKind } from '@/lib/types'
-import { parseDate } from '@/lib/validate'
+import { parseCurrency, parseDate } from '@/lib/validate'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -43,6 +43,8 @@ export async function GET(request: Request): Promise<Response> {
     const from =
       parseDate(searchParams.get('from')) ?? new Date(to.getTime() - 29 * 86_400_000)
     const timeZone = safeTimeZone(searchParams.get('tz'))
+    // У карт разная валюта, поэтому суммировать их вместе без выбора одной было бы неверно.
+    const currency = parseCurrency(searchParams.get('currency')) ?? 'UZS'
 
     // Период уже разобран выше, поэтому переиспользуем общие фильтры только для карты.
     const scoped = new URLSearchParams(searchParams)
@@ -52,6 +54,7 @@ export async function GET(request: Request): Promise<Response> {
 
     const conditions = [
       ...transactionFilters(user.id, scoped),
+      eq(cards.currency, currency),
       sql`${transactions.occurredAt} >= ${from.toISOString()}::timestamptz`,
       sql`${transactions.occurredAt} <= ${to.toISOString()}::timestamptz`,
     ]
@@ -70,6 +73,7 @@ export async function GET(request: Request): Promise<Response> {
           amount: sql`sum(${transactions.amount})`,
         })
         .from(transactions)
+        .innerJoin(cards, eq(cards.id, transactions.cardId))
         .leftJoin(categories, sql`${categories.id} = ${transactions.categoryId}`)
         .where(and(...conditions))
         .groupBy(
@@ -87,6 +91,7 @@ export async function GET(request: Request): Promise<Response> {
           income: sql`sum(case when ${transactions.kind} = 'income' then ${transactions.amount} else 0 end)`,
         })
         .from(transactions)
+        .innerJoin(cards, eq(cards.id, transactions.cardId))
         .where(and(...conditions))
         .groupBy(sql`1`)
         .orderBy(sql`1`),
@@ -124,7 +129,7 @@ export async function GET(request: Request): Promise<Response> {
     }))
 
     const payload: Stats = {
-      currency: user.currency,
+      currency,
       from: from.toISOString(),
       to: to.toISOString(),
       expenseTotal: totals.expense,
