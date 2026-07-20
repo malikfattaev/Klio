@@ -9,7 +9,7 @@ import type { Card, Category, Transaction, TxKind } from '@/lib/types'
 import { CategorySheet } from '@/components/categories/category-sheet'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/components/ui/confirm'
-import { Field, TextInput } from '@/components/ui/field'
+import { Field } from '@/components/ui/field'
 import { groupMoney, MoneyInput } from '@/components/ui/money-input'
 import { Segmented } from '@/components/ui/segmented'
 import { Sheet } from '@/components/ui/sheet'
@@ -72,7 +72,6 @@ function TxForm({
   const [pickedCategoryId, setPickedCategoryId] = useState<number | null>(
     transaction?.categoryId ?? null,
   )
-  const [note, setNote] = useState(transaction?.note ?? '')
   const [occurredAt, setOccurredAt] = useState(() =>
     formatDateTimeLocalValue(transaction?.occurredAt ?? new Date().toISOString()),
   )
@@ -114,7 +113,6 @@ function TxForm({
       categoryId,
       kind,
       amount: minor,
-      note: note.trim() || null,
       occurredAt: parsedDate.toISOString(),
     }
 
@@ -246,15 +244,6 @@ function TxForm({
               </button>
             </div>
           </div>
-
-          <Field label="Описание">
-            <TextInput
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              placeholder="На что ушли деньги"
-              maxLength={200}
-            />
-          </Field>
 
           <Field label="Дата и время">
             <input

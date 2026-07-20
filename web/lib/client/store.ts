@@ -67,11 +67,6 @@ export function useTransactions(filters: TransactionFilters = {}) {
   return { ...swr, items, hasMore, isLoadingMore }
 }
 
-/** Короткая лента для главной — отдельный ключ, чтобы не тянуть страницу истории. */
-export function useRecentTransactions(limit = 8) {
-  return useSWR<TransactionPage>(`/api/transactions?limit=${limit}`, apiFetch, shared)
-}
-
 export function useStats(period: Period, cardId?: number | null) {
   const { from, to } = periodRange(period)
   const params = new URLSearchParams({
@@ -89,7 +84,8 @@ type TransactionInput = {
   categoryId: number | null
   kind: TxKind
   amount: number
-  note: string | null
+  /** Поле описания убрано из UI; сервер трактует его отсутствие как null. */
+  note?: string | null
   occurredAt: string
 }
 

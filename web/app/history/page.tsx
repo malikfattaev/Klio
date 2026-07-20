@@ -2,13 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { SettingsSheet } from '@/components/settings/settings-sheet'
 import { Fab } from '@/components/shell/fab'
 import { TxSheet } from '@/components/tx/tx-sheet'
 import { TxList } from '@/components/tx/tx-list'
 import { Spinner } from '@/components/ui/button'
 import { EmptyState, Skeleton } from '@/components/ui/feedback'
 import { Segmented } from '@/components/ui/segmented'
-import { useBootstrap, useTransactions } from '@/lib/client/store'
+import { useBootstrap, useStats, useTransactions } from '@/lib/client/store'
+import { formatAmount } from '@/lib/format'
 import type { Transaction, TxKind } from '@/lib/types'
 
 type KindFilter = 'all' | TxKind
@@ -26,6 +28,9 @@ export default function HistoryPage() {
   const [pickedCategoryId, setPickedCategoryId] = useState<number | null>(null)
   const [selected, setSelected] = useState<Transaction | null>(null)
   const [creating, setCreating] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
+  const monthStats = useStats('month')
 
   const cards = useMemo(() => bootstrap?.cards ?? [], [bootstrap])
   const categories = useMemo(() => bootstrap?.categories ?? [], [bootstrap])
@@ -74,7 +79,37 @@ export default function HistoryPage() {
   return (
     <>
       <header className="mb-4">
-        <h1 className="mb-4 text-[24px] font-bold">История</h1>
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-[24px] font-bold">История</h1>
+          <button
+            type="button"
+            aria-label="Настройки"
+            onClick={() => setSettingsOpen(true)}
+            className="press flex size-10 shrink-0 items-center justify-center rounded-full bg-raised text-muted"
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden>
+              <circle cx="12" cy="12" r="3.1" stroke="currentColor" strokeWidth="1.7" />
+              <path
+                d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 15.1 4.7a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9v.06a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"
+                stroke="currentColor"
+                strokeWidth="1.4"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mb-4 grid grid-cols-2 gap-2">
+          <MonthTile
+            label="Доходы за месяц"
+            value={formatAmount(monthStats.data?.incomeTotal ?? 0, currency)}
+            tone="income"
+          />
+          <MonthTile
+            label="Расходы за месяц"
+            value={formatAmount(monthStats.data?.expenseTotal ?? 0, currency)}
+            tone="expense"
+          />
+        </div>
 
         <div className="flex flex-col gap-2.5">
           <Segmented options={KIND_OPTIONS} value={kind} onChange={setKind} />
@@ -162,7 +197,36 @@ export default function HistoryPage() {
         defaultCardId={cardId}
         onSaved={() => mutate()}
       />
+
+      <SettingsSheet
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        currency={currency}
+      />
     </>
+  )
+}
+
+function MonthTile({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: string
+  tone: 'income' | 'expense'
+}) {
+  return (
+    <div className="panel px-3.5 py-3">
+      <span className="block text-[12px] text-muted">{label}</span>
+      <span
+        className={`tnum mt-1 block truncate text-[16px] font-semibold ${
+          tone === 'income' ? 'text-income' : 'text-expense'
+        }`}
+      >
+        {value}
+      </span>
+    </div>
   )
 }
 

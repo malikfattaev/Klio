@@ -21,9 +21,7 @@ export const TxRow = memo(function TxRow({
 }) {
   const income = transaction.kind === 'income'
   const title = category?.name ?? 'Без категории'
-  const subtitle = [transaction.note, cardName, formatTime(transaction.occurredAt)]
-    .filter(Boolean)
-    .join(' · ')
+  const subtitle = [cardName, formatTime(transaction.occurredAt)].filter(Boolean).join(' · ')
 
   return (
     <button

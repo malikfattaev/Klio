@@ -52,7 +52,7 @@ export function MoneyInput({
 
   return (
     <div
-      className={`flex items-baseline justify-center gap-2 rounded-2xl border border-white/8 bg-raised ${
+      className={`flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-raised ${
         large ? 'px-4 py-5' : 'h-13 px-4'
       }`}
     >
